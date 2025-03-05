@@ -102,7 +102,8 @@ function MkbSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 	}
 
 	/** Обработчик нажатия на поле ввода */
-	const clickHandler = (ev) => {
+	const clickHandler = (ev: any) => {
+		ev.preventDefault()
 		// Открыть список
 		setIsOpen(true)
 
@@ -174,7 +175,7 @@ function MkbSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 				wrapperRef={wrapperRef}
 				cursor={props.isViewMode ? 'text' : 'pointer'}
 				isOpen={isOpen}
-				buttons={[<InputButton svg={icons.Search} clickHandler={Scripts.openMkbModal()} />]}
+				buttons={[<InputButton svg={icons.Search} clickHandler={() => Scripts.openMkbModal()} />]}
 			/>
 			{isOpen &&
 				<CustomSelectList

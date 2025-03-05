@@ -217,7 +217,9 @@ async function getDiseaseList(): Promise<JsonDataType[]> {
 }
 
 /** Открыть модальное окно с выбором МКБ из дерева */
-function openMkbModal() {}
+function openMkbModal() {
+	alert("Open modal")
+}
 
 export default {
 	setUpdateValueCallback,
