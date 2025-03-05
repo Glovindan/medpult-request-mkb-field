@@ -1,0 +1,14 @@
+#task-mkb-field .filter-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+}
+
+#task-mkb-field .indicator {
+	z-index: 1;
+	position: absolute;
+	right: -6px;
+	top: -6px;
+	display: flex;
+}

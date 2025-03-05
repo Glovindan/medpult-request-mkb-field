@@ -1,0 +1,38 @@
+// @use '../../../common/variables' as *;
+// @use '../../../common/fonts' as *;
+
+.mkb-selected-element {
+	display: flex;
+	flex-direction: row;
+	gap: 12px;
+	background-color: $medpult-bg-color;
+	border-radius: 4px;
+	max-width: 100%;
+	align-items: center;
+	height: 24px;
+	width: fit-content;
+}
+
+.mkb-selected-element__name {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+
+	font-family: 'Inter';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 14px;
+	line-height: 130%;
+	letter-spacing: 0.0025em;
+	color: #2d2d2f;
+
+	padding: 0 6px;
+}
+
+.mkb-selected-element__close-button {
+	cursor: pointer;
+	display: flex;
+	&:active {
+		opacity: 0.8;
+	}
+}

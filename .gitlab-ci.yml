@@ -1,0 +1,47 @@
+stages:
+    - test
+    - sonar
+    - build
+
+before_script:
+    - if [ -f Dockerfile.test ]; then docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD gitint.elewise.com:5050; fi
+
+test:
+    stage: test
+    tags:
+        - ubuntu
+    script:
+        - if [ ! -f Dockerfile.test ]; then exit 0; fi
+        - docker build -t test -f Dockerfile.test .
+        - CONTAINER_ID=$(docker create test) # создает контейнер, но не запускает его
+        - docker cp $CONTAINER_ID:/app/coverage.out .
+        - docker rm $CONTAINER_ID
+    artifacts:
+        paths:
+            - coverage.out
+
+sonarqube-check:
+    stage: sonar
+    tags:
+        - ubuntu
+    script:
+        - export DEBIAN_FRONTEND=noninteractive
+        - export TZ=Europe/Moscow
+        - apt update && apt install -y curl wget
+        - curl -sL https://deb.nodesource.com/setup_18.x | bash -
+        - apt install -y nodejs
+        - npm install -g typescript
+        - if [ ! -f tsconfig.json ]; then tsc --init; fi
+        - chmod +x ./sonarqube.sh
+        - ./sonarqube.sh
+    allow_failure: true
+
+build:
+    stage: build
+    tags:
+        - ubuntu
+    script:
+        - if [ ! -f Dockerfile ]; then exit 0; fi
+        - TAG_NAME=$([ "$CI_COMMIT_REF_NAME" == "master" ] && echo "master" || echo "latest")
+        - docker build -t $IMAGE_NAME:$TAG_NAME .
+        - docker push $IMAGE_NAME:$TAG_NAME

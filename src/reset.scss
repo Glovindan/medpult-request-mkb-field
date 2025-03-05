@@ -1,0 +1,131 @@
+// reset css
+/* Box sizing rules */
+#task-mkb-field *,
+#task-mkb-field *::before,
+#task-mkb-field *::after {
+	box-sizing: border-box;
+}
+
+/* Prevent font size inflation */
+#task-mkb-field html {
+	-moz-text-size-adjust: none;
+	-webkit-text-size-adjust: none;
+	text-size-adjust: none;
+}
+
+/* Remove default margin in favour of better control in authored CSS */
+#task-mkb-field body,
+#task-mkb-field h1,
+#task-mkb-field h2,
+#task-mkb-field h3,
+#task-mkb-field h4,
+#task-mkb-field p,
+#task-mkb-field ul,
+#task-mkb-field li,
+#task-mkb-field figure,
+#task-mkb-field blockquote,
+#task-mkb-field dl,
+#task-mkb-field dd {
+	margin: 0;
+	padding: 0;
+}
+
+/* Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed */
+#task-mkb-field ul[role='list'],
+#task-mkb-field ol[role='list'] {
+	list-style: none;
+}
+
+/* Set core body defaults */
+#task-mkb-field body {
+	min-height: 100vh;
+	line-height: 1.5;
+}
+
+/* Set shorter line heights on headings and interactive elements */
+#task-mkb-field h1,
+#task-mkb-field h2,
+#task-mkb-field h3,
+#task-mkb-field h4,
+#task-mkb-field button,
+#task-mkb-field input,
+#task-mkb-field label {
+	line-height: 1.1;
+}
+
+/* Balance text wrapping on headings */
+#task-mkb-field h1,
+#task-mkb-field h2,
+#task-mkb-field h3,
+#task-mkb-field h4 {
+	text-wrap: balance;
+}
+
+/* A elements that don't have a class get default styles */
+#task-mkb-field a:not([class]) {
+	text-decoration-skip-ink: auto;
+	color: currentColor;
+}
+
+/* Make images easier to work with */
+#task-mkb-field img,
+#task-mkb-field picture {
+	max-width: 100%;
+	display: block;
+}
+
+/* Inherit fonts for inputs and buttons */
+#task-mkb-field input,
+#task-mkb-field button,
+#task-mkb-field textarea,
+#task-mkb-field select {
+	font: inherit;
+}
+
+/* Make sure textarea without a rows attribute are not tiny */
+#task-mkb-field textarea:not([rows]) {
+	min-height: 10em;
+}
+
+/* Anything that has been anchored to should have extra scroll margin */
+:target {
+	scroll-margin-block: 5ex;
+}
+
+#task-mkb-field input[type='text'],
+#task-mkb-field input[type='search'],
+#task-mkb-field input[type='number'],
+#task-mkb-field input[type='tel'],
+#task-mkb-field input[type='date'],
+#task-mkb-field input[type='email'],
+#task-mkb-field input[type='password'],
+#task-mkb-field input:not([class]) {
+	border-radius: initial;
+	border: initial;
+	display: initial;
+	width: initial;
+	background-color: initial;
+	background-image: initial;
+	background-clip: initial;
+}
+
+#task-mkb-field input[type='text']:focus,
+#task-mkb-field input[type='text']:focus-within,
+#task-mkb-field input[type='search']:focus,
+#task-mkb-field input[type='search']:focus-within,
+#task-mkb-field input[type='number']:focus,
+#task-mkb-field input[type='number']:focus-within,
+#task-mkb-field input[type='tel']:focus,
+#task-mkb-field input[type='tel']:focus-within,
+#task-mkb-field input[type='date']:focus,
+#task-mkb-field input[type='date']:focus-within,
+#task-mkb-field input[type='email']:focus,
+#task-mkb-field input[type='email']:focus-within,
+#task-mkb-field input[type='password']:focus,
+#task-mkb-field input[type='password']:focus-within,
+#task-mkb-field input:not([class]):focus,
+#task-mkb-field input:not([class]):focus-within {
+	box-shadow: none;
+	border-color: none;
+	transition: none;
+}
