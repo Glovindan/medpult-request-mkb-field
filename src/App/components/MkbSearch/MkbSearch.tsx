@@ -165,7 +165,7 @@ function MkbSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 	}
 
 	return (
-		<div className="custom-select" ref={rootRef}>
+		<div className="mkb-search" ref={rootRef}>
 			<CustomInput
 				{...restProps}
 				value={isOpen ? query : value}
