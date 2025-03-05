@@ -61,11 +61,16 @@ function MkbField({ values, setValues }: MkbFieldProps) {
     
     // Установить колбэки
 	React.useLayoutEffect(() => {
-        if(!mkbData) return;
+        if(!mkbData.length) return;
 
 		Scripts.setUpdateValueCallback(updateValueByString)
-		Scripts.setGetValueCallback(getValueAsString)
 	}, [mkbData])
+
+	React.useLayoutEffect(() => {
+        if(!mkbData.length) return;
+
+		Scripts.setGetValueCallback(getValueAsString)
+	}, [mkbData, values])
 
 	// Получить список МКБ
 	React.useLayoutEffect(() => {

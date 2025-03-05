@@ -14,6 +14,7 @@ let getValueCallback: GetValueCallback | undefined = undefined;
 /** Установить функцию обратьного вызова для получения значения */
 const setGetValueCallback = (callback: GetValueCallback) => {
 	getValueCallback = callback;
+	window["getValueCallback"] = callback;
 }
 
 // Установка состояния "disabled"
