@@ -1,12 +1,17 @@
 import React, { useDeferredValue, useEffect, useRef, useState } from 'react';
-import CustomInput from '../CustomInput/CustomInput';
-import CustomSelectList from '../CustomSelect/CustomSelectList/CustomSelectList';
-import CustomSelectRow from '../CustomSelect/CustomSelectRow/CustomSelectRow';
-import InputButton from '../InputButton/InputButton';
-import icons from '../shared/icons';
-import { CustomInputProps, FetchInputData } from '../shared/types/types';
-import { ObjectItem } from '../Filters/FiltersTypes';
-import useDebounce from '../shared/utils/hooks';
+import CustomInput from '../../../UIKit/CustomInput/CustomInput';
+import CustomSelectList from '../../../UIKit/CustomSelect/CustomSelectList/CustomSelectList';
+import CustomSelectRow from '../../../UIKit/CustomSelect/CustomSelectRow/CustomSelectRow';
+import InputButton from '../../../UIKit/InputButton/InputButton';
+import icons from '../../../UIKit/shared/icons';
+import { CustomInputProps, FetchInputData } from '../../../UIKit/shared/types/types';
+import { ObjectItem } from '../../../UIKit/Filters/FiltersTypes';
+import useDebounce from '../../../UIKit/shared/utils/hooks';
+import MkbSelectRow from './MkbSelectRow/MkbSelectRow';
+import { findItemById, getAllParentsIds } from '../../shared/utils/utils';
+import { JsonDataType } from '../../shared/types';
+import { MkbItem } from '../MkbField/MkbField';
+import Scripts from '../../shared/utils/clientScripts';
 
 interface CustomInputSearchProps<DataType = string> extends CustomInputProps {
 	/** Измение состояния */
@@ -18,12 +23,20 @@ interface CustomInputSearchProps<DataType = string> extends CustomInputProps {
 	/** Флажок режима просмотра */
 	isViewMode?: boolean,
 	/** Обработчик выбора элемента списка */
-	optionClickHandler?: ({ value, data, closeCallback }: { value: string, data?: DataType, closeCallback: () => void }) => void
+	optionClickHandler?: ({ value, data, closeCallback }: { value: string, data?: DataType, closeCallback: () => void }) => void,
+	/** Элементы списка */
+	values: MkbItem[]
+	/** Список МКБ */
+	mkbData: JsonDataType[]
+	/** Выбрать элемент */
+	addItem: (id: string) => void
+	/** Убрать элемент */
+	removeItem: (id: string) => void
 }
 
 /** Выпадающий список с поиском */
-function CustomInputSearch<DataType>(props: CustomInputSearchProps<DataType>) {
-	const { value, setValue, optionClickHandler, getDataHandler, ...restProps } = props;
+function MkbSearch<DataType>(props: CustomInputSearchProps<DataType>) {
+	const { value, setValue, optionClickHandler, getDataHandler, values, mkbData, addItem, removeItem, ...restProps } = props;
 
 	// Страница
 	const [page, setPage] = useState<number>(0);
@@ -36,7 +49,7 @@ function CustomInputSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 	// Ширина списка
 	const [listWidth, setListWidth] = useState<number>(0);
 	// Значения списка
-	const [values, setValues] = useState<ObjectItem[]>([]);
+	const [listValues, setListValues] = useState<ObjectItem[]>([]);
 	// Ссылка на обертку поля
 	const rootRef = useRef<HTMLDivElement>(null);
 	// Ссылка на поле
@@ -59,7 +72,7 @@ function CustomInputSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 		setHasMore(fetchData.hasMore)
 
 		// Запись данных
-		setValues([...values, ...fetchData.items])
+		setListValues([...values, ...fetchData.items])
 		setPage(page + 1);
 
 		// Скрыть лоадер
@@ -68,7 +81,7 @@ function CustomInputSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 
 	/** Перезагрузка данных списка */
 	const reloadData = (query?: string) => {
-		setValues([]);
+		setListValues([]);
 
 		loadData(query)
 	}
@@ -129,7 +142,25 @@ function CustomInputSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 
 	/** Обработчик скролла по вертикали */
 	const scrollCallback = () => {
-		loadData(query, values, page, hasMore)
+		loadData(query, listValues, page, hasMore)
+	}
+	
+	/** Является ли элемент выбранным */
+	const isItemChecked = (id: string): boolean => {
+        const selectedItemsIds = values.map(value => value.code);
+		// Если элемент явно выбран - является выбранным
+		if(selectedItemsIds.includes(id)) return true;
+
+		const item = findItemById(id, mkbData);
+		// Если элемент не найден в справочнике - не является выбранным
+		if(!item) return false;
+
+		// Если выбран один из цепочки родителей - является выбранным
+		const parentsIds = getAllParentsIds(item, mkbData);
+        if(selectedItemsIds.find(selectedId => parentsIds.find(parentId => parentId === selectedId))) return true
+
+		// Иначе - не является выбранным
+		return false
 	}
 
 	return (
@@ -143,7 +174,7 @@ function CustomInputSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 				wrapperRef={wrapperRef}
 				cursor={props.isViewMode ? 'text' : 'pointer'}
 				isOpen={isOpen}
-				buttons={[<InputButton svg={icons.Triangle} clickHandler={clickHandler} />]}
+				buttons={[<InputButton svg={icons.Search} clickHandler={Scripts.openMkbModal()} />]}
 			/>
 			{isOpen &&
 				<CustomSelectList
@@ -154,11 +185,13 @@ function CustomInputSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 					listWidth={listWidth}
 					scrollCallback={scrollCallback}
 				>
-					{values.map(item =>
-						<CustomSelectRow
+					{listValues.map(item =>
+						<MkbSelectRow
 							value={item.value}
-							clickHandler={() => handleOptionClick(item.value, item.code as any)}
-							// isChecked
+							data={item.code}
+							isSelected={isItemChecked(item.code)}
+							addItem={addItem}
+							removeItem={removeItem}
 						/>
 					)}
 				</CustomSelectList>
@@ -167,4 +200,4 @@ function CustomInputSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 	)
 }
 
-export default CustomInputSearch
+export default MkbSearch
