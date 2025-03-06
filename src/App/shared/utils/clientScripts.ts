@@ -20,9 +20,19 @@ const setGetValueCallback = (callback: GetValueCallback) => {
 // Установка состояния "disabled"
 type UpdateIsDisabledCallback = (isDisabled: true) => void
 let updateIsDisabledCallback: UpdateIsDisabledCallback | undefined = undefined;
-/** Установить функцию обратьного вызова для получения значения */
+/** Установить функцию обратьного вызова для получения значения (Является disabled) */
 const setUpdateIsDisabledCallback = (callback: UpdateIsDisabledCallback) => {
 	updateIsDisabledCallback = callback;
+	window["updateIsDisabledCallback"] = callback;
+}
+
+// Установка состояния isInvalid
+type UpdateIsInvalidCallback = (isInvalid: true) => void
+let updateIsInvalidCallback: UpdateIsInvalidCallback | undefined = undefined;
+/** Установить функцию обратьного вызова для статуса валидации поля (Является не валидным) */
+const setUpdateIsInvalidCallback = (callback: UpdateIsInvalidCallback) => {
+	updateIsInvalidCallback = callback;
+	window["updateIsInvalidCallback"] = callback;
 }
 
 /** Получение списка болезней */
@@ -226,6 +236,7 @@ export default {
 	setUpdateValueCallback,
 	setGetValueCallback,
 	setUpdateIsDisabledCallback,
+	setUpdateIsInvalidCallback,
 	getDiseaseList,
 	openMkbModal
 }

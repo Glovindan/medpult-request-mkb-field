@@ -25,16 +25,20 @@ export interface MkbItem {
 }
 
 interface MkbFieldProps {
-	/** Элементы списка */
-	values: MkbItem[]
-	/** Изменить значение массива элемента списка */
-	setValues: (values: MkbItem[]) => void
 }
 
 /** Выпадающий список с множественным выбором и поиском */
-function MkbField({ values, setValues }: MkbFieldProps) {
+function MkbField({}: MkbFieldProps) {
+    /** Выбранные МКБ */
+    const [values, setValues] = useState<MkbItem[]>([]);
+    /** Список МКБ */
 	const [mkbData, setMkbData] = useState<JsonDataType[]>([])
+    /** Поисковый запрос */
 	const [searchQuery, setSearchQuery] = useState<string>('')
+    /** Поле заблокировано для ввода */
+	const [isDisabled, setIsDisabled] = useState<boolean>(false)
+    /** Поле не валидно */
+	const [isInvalid, setIsInvalid] = useState<boolean>(false)
 
     /** Обновить значения по строке с разделителем ";" */
 	const updateValueByString = (codes: string) => {
@@ -60,23 +64,32 @@ function MkbField({ values, setValues }: MkbFieldProps) {
     }
     
     // Установить колбэки
+    // Колбек получения значения
 	React.useLayoutEffect(() => {
         if(!mkbData.length) return;
 
 		Scripts.setUpdateValueCallback(updateValueByString)
 	}, [mkbData])
 
+    // Колбек изменения значения
 	React.useLayoutEffect(() => {
         if(!mkbData.length) return;
-
+        
 		Scripts.setGetValueCallback(getValueAsString)
 	}, [mkbData, values])
 
-	// Получить список МКБ
+    // Колбеки валидности и заблокированности
+    React.useLayoutEffect(() => {
+        Scripts.setUpdateIsDisabledCallback(setIsDisabled);
+        Scripts.setUpdateIsInvalidCallback(setIsInvalid);
+    }, [])
+
+	// Получить список МКБ при загрузке
 	React.useLayoutEffect(() => {
 		Scripts.getDiseaseList().then((mkbList) => setMkbData(mkbList))
 	}, [])
 
+    /** Поиск МКБ */
 	const getDataHandler = (page: number, query?: string): Promise<FetchInputData> => {
 		const batchSize = 20
 
@@ -122,24 +135,30 @@ function MkbField({ values, setValues }: MkbFieldProps) {
         if(selectedItemsIds.includes(id)) return;
         // Добавить текущий элемент
         selectedItemsIds.push(id);
-        console.log("selectedItemsIds", JSON.stringify(selectedItemsIds))
 
         // id родительских элементов
         const parentsIds = getAllParentsIds(item, mkbData);
         // Если указан родительский элемент - не добавлять текущий
         if(selectedItemsIds.find(selectedId => parentsIds.find(parentId => selectedId == parentId))) return;
-        
-        // Родительский элемент
-        const parentItem = item!.parentID ? findItemById(item!.parentID, mkbData) : undefined;
-        // id дочерних элементы
-        const parentItemChildrenIds = parentItem?.children?.map(child => child.id);
-        // Выбранные дочерние элементы
-        const includedChildrenIds = selectedItemsIds.filter(id => parentItemChildrenIds?.find(childId => childId === id));
-        // Если выбраны все дочерние элементы родительского элемента, то работать с родительским элементом
-        if(parentItem && includedChildrenIds.length === parentItemChildrenIds?.length) {
+
+        // Найти последний родительский элемент, у которого выбраны все дочерние элементы, кроме одного
+        for(const parentId of parentsIds) {
+            const parentItem = findItemById(parentId, mkbData)
+            // id дочерних элементы
+            const parentItemChildrenIds = parentItem?.children?.map(child => child.id);
+            // Выбранные дочерние элементы
+            const includedChildrenIds = selectedItemsIds
+                .filter(id => parentItemChildrenIds?.find(childId => childId === id))
+                .filter(includedId => id != includedId);
+
+            // Если выбраны не все дочерние элементы кроме одного, завершить цикл
+            if(!parentItem || includedChildrenIds.length !== (parentItemChildrenIds?.length ?? 1) - 1) break;
+
+            // Если условие соблюдено, то следующий родитель
             item = parentItem;
-            selectedItemsIds.push(parentItem.id);
         }
+        
+        if(!selectedItemsIds.includes(item.id)) selectedItemsIds.push(item.id);
 
         // Удалить все дочерние элементы
         const childrenIds = getAllChildrenIds(item);
@@ -208,6 +227,9 @@ function MkbField({ values, setValues }: MkbFieldProps) {
                     addItem={addItem}
                     removeItem={removeItem}
                     mkbData={mkbData}
+
+                    isDisabled={isDisabled}
+                    isInvalid={isInvalid}
 				/>
 			</div>
 			<div className="mkb-selected-list">
@@ -216,6 +238,7 @@ function MkbField({ values, setValues }: MkbFieldProps) {
 						key={item.code}
 						name={item.value}
 						deleteHandler={() => removeItem(item.code)}
+                        isDisabled={isDisabled}
 					/>
 				))}
 			</div>

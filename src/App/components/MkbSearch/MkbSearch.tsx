@@ -32,11 +32,15 @@ interface CustomInputSearchProps<DataType = string> extends CustomInputProps {
 	addItem: (id: string) => void
 	/** Убрать элемент */
 	removeItem: (id: string) => void
+	/** Является невалидным */
+	isInvalid: boolean
+	/** Является неактивным */
+	isDisabled: boolean
 }
 
 /** Выпадающий список с поиском */
 function MkbSearch<DataType>(props: CustomInputSearchProps<DataType>) {
-	const { value, setValue, optionClickHandler, getDataHandler, values, mkbData, addItem, removeItem, ...restProps } = props;
+	const { value, setValue, optionClickHandler, getDataHandler, values, mkbData, addItem, removeItem, isInvalid, isDisabled, ...restProps } = props;
 
 	// Страница
 	const [page, setPage] = useState<number>(0);
@@ -166,17 +170,21 @@ function MkbSearch<DataType>(props: CustomInputSearchProps<DataType>) {
 
 	return (
 		<div className="mkb-search" ref={rootRef}>
-			<CustomInput
-				{...restProps}
-				value={isOpen ? query : value}
-				setValue={v => setQuery(v)}
-				onInput={inputHandler}
-				clickHandler={clickHandler}
-				wrapperRef={wrapperRef}
-				cursor={props.isViewMode ? 'text' : 'pointer'}
-				isOpen={isOpen}
-				buttons={[<InputButton svg={icons.Search} clickHandler={() => Scripts.openMkbModal()} />]}
-			/>
+			{
+				!isDisabled &&
+				<CustomInput
+					{...restProps}
+					value={isOpen ? query : value}
+					setValue={v => setQuery(v)}
+					onInput={inputHandler}
+					clickHandler={clickHandler}
+					wrapperRef={wrapperRef}
+					cursor={props.isViewMode ? 'text' : 'pointer'}
+					isOpen={isOpen}
+					buttons={[<InputButton svg={icons.Search} clickHandler={() => Scripts.openMkbModal()} />]}
+					isInvalid={isInvalid}
+				/>
+			}
 			{isOpen &&
 				<CustomSelectList
 					rootRef={rootRef}
