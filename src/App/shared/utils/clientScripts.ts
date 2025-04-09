@@ -18,7 +18,7 @@ const setGetValueCallback = (callback: GetValueCallback) => {
 }
 
 // Установка состояния "disabled"
-type UpdateIsDisabledCallback = (isDisabled: true) => void
+type UpdateIsDisabledCallback = (isDisabled: boolean) => void
 let updateIsDisabledCallback: UpdateIsDisabledCallback | undefined = undefined;
 /** Установить функцию обратьного вызова для получения значения (Является disabled) */
 const setUpdateIsDisabledCallback = (callback: UpdateIsDisabledCallback) => {
@@ -27,7 +27,7 @@ const setUpdateIsDisabledCallback = (callback: UpdateIsDisabledCallback) => {
 }
 
 // Установка состояния isInvalid
-type UpdateIsInvalidCallback = (isInvalid: true) => void
+type UpdateIsInvalidCallback = (isInvalid: boolean) => void
 let updateIsInvalidCallback: UpdateIsInvalidCallback | undefined = undefined;
 /** Установить функцию обратьного вызова для статуса валидации поля (Является не валидным) */
 const setUpdateIsInvalidCallback = (callback: UpdateIsInvalidCallback) => {
